@@ -14,6 +14,9 @@ namespace EventPlanner.Entities.Models
         [Required]
         public int UserId { get; set; }
 
+        [Required]
+        public VoteType Type { get; set; } = VoteType.Date;
+
         [Required, MaxLength(255)]
         public required string VoteOption { get; set; }
 
@@ -24,5 +27,11 @@ namespace EventPlanner.Entities.Models
 
         [ForeignKey("UserId")]
         public virtual required User User { get; set; }
+    }
+
+    public enum VoteType
+    {
+        Date,
+        Location
     }
 }
