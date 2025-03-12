@@ -11,16 +11,17 @@ namespace EventPlanner.Entities.Models
         [Required]
         public int CreatorId { get; set; }
 
+        [Required]
+        public long TelegramChatId { get; set; }
+
         [Required, MaxLength(255)]
         public required string Title { get; set; }
 
-        public required string Description { get; set; }
+        public required string Description { get; set; } = string.Empty;
 
-        [Required]
-        public DateTime EventDate { get; set; }
+        public DateTime? EventDate { get; set; }
 
-        [MaxLength(255)]
-        public required string Location { get; set; }
+        public string? Location { get; set; } = null;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

@@ -6,6 +6,8 @@ namespace EventPlanner.Repository
     {
         Task<IEnumerable<Event>> GetByCreatorAsync(int creatorId);
 
+        Task<Event> GetByTelegramChatIdAsync(long telegramChatId);
+
         Task<IEnumerable<Event>> GetByDateRangeAsync(DateTime startDate, DateTime endDate);
 
         Task<IEnumerable<Event>> GetByLocationAsync(string location);

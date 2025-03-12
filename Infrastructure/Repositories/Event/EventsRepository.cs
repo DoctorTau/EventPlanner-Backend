@@ -78,5 +78,14 @@ namespace EventPlanner.Repository
 
             return @event;
         }
+
+        public async Task<Event> GetByTelegramChatIdAsync(long telegramChatId)
+        {
+            var @event = await _dbContext.Events.Where(e => e.TelegramChatId == telegramChatId).FirstOrDefaultAsync();
+            if (@event == null || @event.Id == 0)
+                throw new KeyNotFoundException($"Event with telegram chat id {telegramChatId} not found");
+
+            return @event;
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace EventPlanner.Repository
 {
     public interface IUserRepository : IRepository<User>
     {
-        public Task<User> GetUserByTelegramIdAsync(int telegramId);
+        public Task<User> GetUserByTelegramIdAsync(long telegramId);
     }
 
 }

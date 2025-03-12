@@ -18,7 +18,7 @@ namespace EventPlanner.Repository
             return await _dbContext.Users.ToListAsync();
         }
 
-        public async Task<User> GetUserByTelegramIdAsync(int telegramId)
+        public async Task<User> GetUserByTelegramIdAsync(long telegramId)
         {
             var user = await _dbContext.Users.FindAsync(telegramId);
 
@@ -58,6 +58,5 @@ namespace EventPlanner.Repository
             await _dbContext.SaveChangesAsync();
         }
 
-        
     }
 }

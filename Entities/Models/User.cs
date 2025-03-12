@@ -21,6 +21,7 @@ namespace EventPlanner.Entities.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public virtual required ICollection<UserAvailability> Availabilities { get; set; }
         public virtual required ICollection<Event> CreatedEvents { get; set; }
         public virtual required ICollection<Participant> Participations { get; set; }
         public virtual required ICollection<TaskItem> AssignedTasks { get; set; }
