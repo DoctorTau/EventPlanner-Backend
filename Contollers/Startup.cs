@@ -23,10 +23,16 @@ public class Startup
 
         ConfigureRepositories(services);
         ConfigureBusinessServices(services);
+        ConfigureControllers(services);
 
         // Add services to the container.
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+    }
+
+    private void ConfigureControllers(IServiceCollection services)
+    {
+        services.AddControllers();
     }
 
     private void ConfigureRepositories(IServiceCollection services)
@@ -59,11 +65,8 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            // Add controller get method to get users
-            endpoints.MapGet("/users", async (IAppDbContext dbContext) =>
-            {
-                return Results.Ok(await dbContext.Users.ToListAsync());
-            });
+            endpoints.MapControllers();
         });
+
     }
 }
