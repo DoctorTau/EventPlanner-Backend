@@ -9,7 +9,7 @@ namespace EventPlanner.Entities.Models
         public int Id { get; set; }
 
         [Required]
-        public int EventId { get; set; }
+        public int VotingId { get; set; }
 
         [Required]
         public int UserId { get; set; }
@@ -22,8 +22,8 @@ namespace EventPlanner.Entities.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [ForeignKey("EventId")]
-        public virtual required Event Event { get; set; }
+        [ForeignKey("VoteId")]
+        public virtual required Voting Voting { get; set; }
 
         [ForeignKey("UserId")]
         public virtual required User User { get; set; }

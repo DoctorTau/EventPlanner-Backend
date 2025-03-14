@@ -21,6 +21,8 @@ namespace EventPlanner.Entities.Models
 
         [ForeignKey("EventId")]
         public virtual required Event Event { get; set; }
+
+        public virtual required ICollection<Vote> Votes { get; set; }
     }
 
     public enum VoteType

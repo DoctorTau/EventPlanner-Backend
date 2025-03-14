@@ -74,12 +74,6 @@ namespace EventPlanner.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Vote>()
-                .HasOne(v => v.Event)
-                .WithMany(e => e.Votes)
-                .HasForeignKey(v => v.EventId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Vote>()
                 .HasOne(v => v.User)
                 .WithMany(u => u.Votes)
                 .HasForeignKey(v => v.UserId)
@@ -111,6 +105,12 @@ namespace EventPlanner.Data
                 .WithOne()
                 .HasForeignKey<Event>(e => e.PlaceVotingId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Vote>()
+                .HasOne(v => v.Voting)
+                .WithMany(voting => voting.Votes)
+                .HasForeignKey(v => v.VotingId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

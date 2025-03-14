@@ -14,32 +14,32 @@ namespace EventPlanner.Repository
             _context = context;
         }
 
-        async Task<IEnumerable<Vote>> IVoteRepository.GetVotesByEventIdAsync(int eventId)
+        public async Task<IEnumerable<Vote>> GetVotesByVotingAsync(int votingId)
         {
-            return await _context.Votes.Where(v => v.EventId == eventId).ToListAsync();
+            return await _context.Votes.Where(v => v.VotingId == votingId).ToListAsync();
         }
 
-        async Task<Vote> IVoteRepository.GetUserVoteAsync(int eventId, int userId)
+        public async Task<Vote> GetUserVoteAsync(int votingId, int userId)
         {
-            var vote = await _context.Votes.FirstOrDefaultAsync(v => v.EventId == eventId && v.UserId == userId);
+            var vote = await _context.Votes.FirstOrDefaultAsync(v => v.VotingId == votingId && v.UserId == userId);
 
             if (vote == null)
-                throw new KeyNotFoundException($"Vote with event id {eventId} and user id {userId} not found");
+                throw new KeyNotFoundException($"Vote with voting id {votingId} and user id {userId} not found");
 
             return vote;
         }
 
-        async Task<string> IVoteRepository.GetMostPopularVoteOptionAsync(int eventId)
+        public async Task<string> GetMostPopularVoteOptionAsync(int votingId)
         {
             var vote = await _context.Votes
-                .Where(v => v.EventId == eventId)
+                .Where(v => v.VotingId == votingId)
                 .GroupBy(v => v.VoteOption)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
                 .FirstOrDefaultAsync();
 
             if (vote == null || vote == string.Empty)
-                throw new KeyNotFoundException($"Vote with event id {eventId} not found");
+                throw new KeyNotFoundException($"Vote with event id {votingId} not found");
 
             return vote;
         }

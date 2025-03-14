@@ -4,8 +4,8 @@ namespace EventPlanner.Repository
 {
     public interface IVoteRepository : IRepository<Vote>
     {
-        Task<IEnumerable<Vote>> GetVotesByEventIdAsync(int eventId);
-        Task<Vote> GetUserVoteAsync(int eventId, int userId);
-        Task<string> GetMostPopularVoteOptionAsync(int eventId);
+        Task<IEnumerable<Vote>> GetVotesByVotingAsync(int votingId);
+        Task<Vote> GetUserVoteAsync(int votingId, int userId);
+        Task<string> GetMostPopularVoteOptionAsync(int votingId);
     }
 }

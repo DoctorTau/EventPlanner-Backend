@@ -1,5 +1,7 @@
 using EventPlanner.Data;
 using EventPlanner.Repository;
+using EventPlanner.Business;
+using EventPlanner.Services;
 using Microsoft.EntityFrameworkCore;
 
 public class Startup
@@ -20,6 +22,7 @@ public class Startup
             options.UseNpgsql(connectionString));
 
         ConfigureRepositories(services);
+        ConfigureBusinessServices(services);
 
         // Add services to the container.
         services.AddEndpointsApiExplorer();
@@ -33,6 +36,12 @@ public class Startup
         services.AddScoped<IUserAvailabilityRepository, UserAvailabilityRepository>();
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
         services.AddScoped<IVoteRepository, VoteRepository>();
+    }
+
+    private void ConfigureBusinessServices(IServiceCollection services)
+    {
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IEventService, EventService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
