@@ -14,6 +14,7 @@ namespace EventPlanner.Data
         public DbSet<TaskItem> TaskItems { get; set; }
         public DbSet<EventDocument> EventDocuments { get; set; }
         public DbSet<Vote> Votes { get; set; }
+        public DbSet<Voting> Votings { get; set; }
         public DbSet<LLMGeneratedPlan> LLMGeneratedPlans { get; set; }
         public DbSet<UserAvailability> UserAvailabilities { get; set; }
 
@@ -98,6 +99,18 @@ namespace EventPlanner.Data
 
             modelBuilder.Entity<UserAvailability>()
                 .HasKey(ua => new { ua.UserId, ua.AvailableDate });
+
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.TimeVoting)
+                .WithOne()
+                .HasForeignKey<Event>(e => e.TimeVotingId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.PlaceVoting)
+                .WithOne()
+                .HasForeignKey<Event>(e => e.PlaceVotingId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

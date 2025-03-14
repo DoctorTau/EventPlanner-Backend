@@ -23,10 +23,16 @@ namespace EventPlanner.Entities.Models
 
         public string? Location { get; set; } = null;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int? TimeVotingId { get; set; }
+        public int? PlaceVotingId { get; set; }
 
-        [ForeignKey("CreatorId")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public virtual required User Creator { get; set; }
+
+        [ForeignKey("TimeVotingId")]
+        public virtual Voting? TimeVoting { get; set; }
+        [ForeignKey("PlaceVotingId")]
+        public virtual Voting? PlaceVoting { get; set; }
 
         public virtual required ICollection<Participant> Participants { get; set; }
         public virtual required ICollection<TaskItem> Tasks { get; set; }
