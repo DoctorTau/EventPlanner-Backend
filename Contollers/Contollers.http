@@ -1,6 +1,4 @@
 @Contollers_HostAddress = http://localhost:5026
-
-GET {{Contollers_HostAddress}}/weatherforecast/
-Accept: application/json
+@Contollers_HostAddress = https://localhost:8080
 
 ###

@@ -3,6 +3,7 @@ using EventPlanner.Repository;
 using EventPlanner.Business;
 using EventPlanner.Services;
 using Microsoft.EntityFrameworkCore;
+using TgMiniAppAuth;
 
 public class Startup
 {
@@ -21,18 +22,41 @@ public class Startup
         services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             options.UseNpgsql(connectionString));
 
+        services.AddHttpContextAccessor();
+
         ConfigureRepositories(services);
         ConfigureBusinessServices(services);
         ConfigureControllers(services);
+
+        services.AddTgMiniAppAuth(_configuration);
+
+        AddCors(services);
 
         // Add services to the container.
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
     }
 
+    private void AddCors(IServiceCollection services)
+    {
+        services.AddCors(options =>
+      {
+          options.AddPolicy("AllowAll", builder =>
+          {
+              builder.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+          });
+      });
+    }
+
     private void ConfigureControllers(IServiceCollection services)
     {
-        services.AddControllers();
+
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        });
     }
 
     private void ConfigureRepositories(IServiceCollection services)
@@ -59,14 +83,18 @@ public class Startup
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
+
+        app.UseCors("AllowAll");
 
         app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
         });
-
     }
 }

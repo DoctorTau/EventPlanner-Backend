@@ -20,9 +20,9 @@ namespace EventPlanner.Repository
 
         public async Task<User> GetUserByTelegramIdAsync(long telegramId)
         {
-            var user = await _dbContext.Users.FindAsync(telegramId);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.TelegramId == telegramId);
 
-            if (user == null)
+            if (user == null || user.TelegramId != telegramId)
                 throw new KeyNotFoundException($"User with telegram id {telegramId} not found");
 
             return user;
