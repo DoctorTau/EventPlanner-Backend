@@ -1,6 +1,6 @@
 namespace EventPlanner.Entities.Models.Dto
 {
-    public class UserCreateDto
+    public class UserDto
     {
         public long TelegramId { get; set; }
         public string Username { get; set; } = string.Empty;

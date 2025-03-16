@@ -1,4 +1,5 @@
 using EventPlanner.Business;
+using EventPlanner.Entities.Models;
 using EventPlanner.Entities.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,6 @@ namespace EventPlanner_Backend.Controllers
         private readonly IUserService _userService;
         private readonly ITelegramUserAccessor _telegramUserAccessor;
 
-
         public EventController(IEventService eventService, ITelegramUserAccessor telegramUserAccessor, IUserService userService)
         {
             _eventService = eventService;
@@ -30,6 +30,45 @@ namespace EventPlanner_Backend.Controllers
             {
                 var @event = await _eventService.CreateEventAsync(newEvent);
                 return Ok(@event);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("{eventId}")]
+        public async Task<ActionResult<EventWithParticipantsDto>> GetEventByIdAsync(int eventId)
+        {
+            try
+            {
+                var @event = await _eventService.GetEventWithParticipantsAsync(eventId);
+                if (@event == null)
+                    return NotFound("Event not found");
+
+                EventWithParticipantsDto eventWithParticipantsDto = new EventWithParticipantsDto
+                {
+                    Id = @event.Id,
+                    Title = @event.Title,
+                    TelegramChatId = @event.TelegramChatId,
+                    EventDate = @event.EventDate,
+                    Location = @event.Location,
+                    Description = @event.Description,
+                    Participants = (await Task.WhenAll(@event.Participants.Select(
+                        async p =>
+                        {
+                            var user = await _userService.GetUserAsync(p.UserId);
+                            return new UserDto
+                            {
+                                TelegramId = user.TelegramId,
+                                Username = user.Username,
+                                FirstName = user.FirstName,
+                                LastName = user.LastName
+                            };
+                        }
+                    ))).ToList()
+                };
+                return Ok(eventWithParticipantsDto);
             }
             catch (Exception e)
             {

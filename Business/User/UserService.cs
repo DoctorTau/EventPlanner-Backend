@@ -30,7 +30,7 @@ namespace EventPlanner.Business
             return await _userRepository.GetUserByTelegramIdAsync(telegramId);
         }
 
-        public async Task<User> CreateUserAsync(UserCreateDto newUser)
+        public async Task<User> CreateUserAsync(UserDto newUser)
         {
             User createdUser = new User
             {

@@ -34,7 +34,7 @@ namespace EventPlanner_Backend.Controllers
             }
             catch (KeyNotFoundException)
             {
-                var userCreateDto = new UserCreateDto
+                var userCreateDto = new UserDto
                 {
                     TelegramId = _telegramUserAccessor.User.Id,
                     Username = _telegramUserAccessor.User.Username ?? string.Empty,

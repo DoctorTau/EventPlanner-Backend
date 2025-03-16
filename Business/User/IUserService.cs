@@ -8,7 +8,7 @@ namespace EventPlanner.Business
         Task<IEnumerable<User>> GetUsersAsync();
         Task<User> GetUserAsync(int id);
         Task<User> GetUserByTelegramIdAsync(long telegramId);
-        Task<User> CreateUserAsync(UserCreateDto newUser);
+        Task<User> CreateUserAsync(UserDto newUser);
         Task<User> UpdateUserAsync(User updatedUser);
         Task DeleteUserAsync(int id);
 

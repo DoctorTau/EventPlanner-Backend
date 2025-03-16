@@ -89,5 +89,10 @@ namespace EventPlanner.Business
         {
             return await _eventRepository.GetAllUsersEventsAsync(userId);
         }
+
+        public Task<Event> GetEventWithParticipantsAsync(int eventId)
+        {
+            return _eventRepository.GetEventWithDetailsAsync(eventId);
+        }
     }
 }

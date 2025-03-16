@@ -6,6 +6,7 @@ namespace EventPlanner.Business
     public interface IEventService
     {
         Task<Event> CreateEventAsync(EventCreateDto newEvent);
+        Task<Event> GetEventWithParticipantsAsync(int eventId);
         Task<Event> GetEventByTelegramChatIdAsync(long telegramChatId);
         Task UpdateEventDateAsync(int eventId, DateTime selectedDate);
         Task UpdateEventLocationAsync(int eventId, string selectedLocation);
