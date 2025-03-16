@@ -30,6 +30,10 @@ namespace EventPlanner.Repository
 
         public async Task<Event> CreateAsync(Event @event)
         {
+            var eventWithChatId = await _dbContext.Events.FirstOrDefaultAsync(e => e.TelegramChatId == @event.TelegramChatId);
+            if (eventWithChatId != null && eventWithChatId.Id != 0)
+                return eventWithChatId;
+
             var result = await _dbContext.Events.AddAsync(@event);
             await _dbContext.SaveChangesAsync();
             return result.Entity;

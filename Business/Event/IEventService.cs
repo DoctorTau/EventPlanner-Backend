@@ -1,7 +1,7 @@
 using EventPlanner.Entities.Models;
 using EventPlanner.Entities.Models.Dto;
 
-namespace EventPlanner.Services
+namespace EventPlanner.Business
 {
     public interface IEventService
     {

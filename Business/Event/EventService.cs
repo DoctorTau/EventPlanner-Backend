@@ -2,7 +2,7 @@ using EventPlanner.Entities.Models;
 using EventPlanner.Entities.Models.Dto;
 using EventPlanner.Repository;
 
-namespace EventPlanner.Services
+namespace EventPlanner.Business
 {
     public class EventService : IEventService
     {
@@ -22,7 +22,7 @@ namespace EventPlanner.Services
 
         public async Task<Event> CreateEventAsync(EventCreateDto newEvent)
         {
-            var creator = await _userRepository.GetByIdAsync(newEvent.UserId);
+            var creator = await _userRepository.GetUserByTelegramIdAsync(newEvent.UserId);
             var createdEvent = new Event
             {
                 Title = newEvent.EventName,

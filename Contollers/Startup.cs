@@ -1,7 +1,6 @@
 using EventPlanner.Data;
 using EventPlanner.Repository;
 using EventPlanner.Business;
-using EventPlanner.Services;
 using Microsoft.EntityFrameworkCore;
 using TgMiniAppAuth;
 
