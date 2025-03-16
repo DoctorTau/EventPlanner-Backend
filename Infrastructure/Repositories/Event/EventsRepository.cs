@@ -91,5 +91,10 @@ namespace EventPlanner.Repository
 
             return @event;
         }
+
+        public async Task<List<Event>> GetAllUsersEventsAsync(int userId)
+        {
+            return await _dbContext.Events.Where(e => e.Participants.Any(p => p.UserId == userId)).ToListAsync();
+        }
     }
 }

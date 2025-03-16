@@ -84,5 +84,10 @@ namespace EventPlanner.Business
 
             await _participantRepository.CreateAsync(participant);
         }
+
+        public async Task<List<Event>> GetAllUsersEventsAsync(int userId)
+        {
+            return await _eventRepository.GetAllUsersEventsAsync(userId);
+        }
     }
 }

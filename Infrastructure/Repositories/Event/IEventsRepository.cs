@@ -13,5 +13,6 @@ namespace EventPlanner.Repository
         Task<IEnumerable<Event>> GetByLocationAsync(string location);
 
         Task<Event> GetEventWithDetailsAsync(int eventId); // Includes Participants & Tasks
+        Task<List<Event>> GetAllUsersEventsAsync(int userId);
     }
 }

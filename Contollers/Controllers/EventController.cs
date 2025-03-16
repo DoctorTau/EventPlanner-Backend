@@ -1,5 +1,6 @@
 using EventPlanner.Business;
 using EventPlanner.Entities.Models.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TgMiniAppAuth;
 using TgMiniAppAuth.AuthContext;
@@ -29,6 +30,61 @@ namespace EventPlanner_Backend.Controllers
             {
                 var @event = await _eventService.CreateEventAsync(newEvent);
                 return Ok(@event);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("getByTelegramChatId")]
+        public async Task<IActionResult> GetEventByTelegramChatIdAsync(long telegramChatId)
+        {
+            try
+            {
+                var @event = await _eventService.GetEventByTelegramChatIdAsync(telegramChatId);
+                return Ok(@event);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("getUsersEvents")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<ActionResult<List<EventResponseDto>>> GetAllUsersEventsAsync()
+        {
+            try
+            {
+                var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
+                var events = await _eventService.GetAllUsersEventsAsync(user.Id);
+                List<EventResponseDto> eventsDto = events.Select(e => new EventResponseDto
+                {
+                    Id = e.Id,
+                    Title = e.Title,
+                    TelegramChatId = e.TelegramChatId,
+                    EventDate = e.EventDate,
+                    Location = e.Location,
+                    Description = e.Description
+                }).ToList();
+                return Ok(eventsDto);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("{eventId}/join")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<IActionResult> JoinEventAsync(int eventId)
+        {
+            try
+            {
+                var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
+                await _eventService.AddParticipantAsync(eventId, user.Id);
+                return Ok("User joined event");
             }
             catch (Exception e)
             {
