@@ -14,5 +14,6 @@ namespace EventPlanner.Business
 
         Task<List<UserAvailability>> GetUserAvailabilitiesAsync(int userId);
         Task AddUserAvailabilityAsync(int userId, UserAvailabilityDto availability);
+        Task DeleteUserAvailabilityAsync(int userId, DateTime dateTime);
     }
 }

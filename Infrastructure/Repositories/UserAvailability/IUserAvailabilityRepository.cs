@@ -4,6 +4,6 @@ namespace EventPlanner.Repository
 {
     public interface IUserAvailabilityRepository : IRepository<UserAvailability>
     {
-        public Task<IEnumerable<UserAvailability>> GetByUserIdAsync(int userId);
+        public Task<List<UserAvailability>> GetByUserIdAsync(int userId);
     }
 }

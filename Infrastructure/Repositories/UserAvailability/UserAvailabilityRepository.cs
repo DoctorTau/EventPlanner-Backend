@@ -28,7 +28,7 @@ namespace EventPlanner.Repository
             return userAvailability;
         }
 
-        public async Task<IEnumerable<UserAvailability>> GetByUserIdAsync(int userId)
+        public async Task<List<UserAvailability>> GetByUserIdAsync(int userId)
         {
             var userAvailability = await _dbContext.UserAvailabilities.Where(ua => ua.UserId == userId).ToListAsync();
 

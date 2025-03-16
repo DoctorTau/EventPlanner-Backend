@@ -65,7 +65,7 @@ namespace EventPlanner.Business
         public async Task<List<UserAvailability>> GetUserAvailabilitiesAsync(int userId)
         {
             var UserAvailabilities = await _userAvailabilityRepository.GetByUserIdAsync(userId);
-            return [.. UserAvailabilities];
+            return UserAvailabilities;
         }
 
         public async Task AddUserAvailabilityAsync(int userId, UserAvailabilityDto availability)
@@ -81,6 +81,18 @@ namespace EventPlanner.Business
             };
 
             await _userAvailabilityRepository.CreateAsync(userAvailability);
+        }
+
+        public async Task DeleteUserAvailabilityAsync(int userId, DateTime dateTime)
+        {
+            var userAvailability = await _userAvailabilityRepository.GetByUserIdAsync(userId);
+            if (userAvailability == null)
+                throw new KeyNotFoundException($"User availability with user id {userId} not found");
+
+            var userAvailabilityToDelete = userAvailability.FirstOrDefault(ua => ua.AvailableDate == dateTime);
+            if (userAvailabilityToDelete == null || userAvailabilityToDelete.AvailableDate != dateTime)
+                throw new KeyNotFoundException($"User availability with date {dateTime} not found");
+            await _userAvailabilityRepository.DeleteAsync(userAvailabilityToDelete);
         }
     }
 }
