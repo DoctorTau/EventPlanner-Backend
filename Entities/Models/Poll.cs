@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EventPlanner.Entities.Models
 {
-    public class Voting
+    public class Poll
     {
         [Key]
         public int Id { get; set; }

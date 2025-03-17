@@ -30,9 +30,9 @@ namespace EventPlanner.Entities.Models
         public virtual required User Creator { get; set; }
 
         [ForeignKey("TimeVotingId")]
-        public virtual Voting? TimeVoting { get; set; }
+        public virtual Poll? TimeVoting { get; set; }
         [ForeignKey("PlaceVotingId")]
-        public virtual Voting? PlaceVoting { get; set; }
+        public virtual Poll? PlaceVoting { get; set; }
 
         public virtual required ICollection<Participant> Participants { get; set; }
         public virtual required ICollection<TaskItem> Tasks { get; set; }

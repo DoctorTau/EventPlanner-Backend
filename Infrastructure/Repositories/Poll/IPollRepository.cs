@@ -2,8 +2,9 @@ using EventPlanner.Entities.Models;
 
 namespace EventPlanner.Repository
 {
-    public interface IVotingRepository : IRepository<Voting>
+    public interface IPollRepository : IRepository<Poll>
     {
         Task<List<Vote>> GetVotesAsync(int eventId);
+        Task<Poll> GetPollByEventIdAsync(int eventId);
     }
 }

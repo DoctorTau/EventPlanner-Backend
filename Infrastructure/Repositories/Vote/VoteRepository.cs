@@ -16,12 +16,12 @@ namespace EventPlanner.Repository
 
         public async Task<IEnumerable<Vote>> GetVotesByVotingAsync(int votingId)
         {
-            return await _context.Votes.Where(v => v.VotingId == votingId).ToListAsync();
+            return await _context.Votes.Where(v => v.PollId == votingId).ToListAsync();
         }
 
         public async Task<Vote> GetUserVoteAsync(int votingId, int userId)
         {
-            var vote = await _context.Votes.FirstOrDefaultAsync(v => v.VotingId == votingId && v.UserId == userId);
+            var vote = await _context.Votes.FirstOrDefaultAsync(v => v.PollId == votingId && v.UserId == userId);
 
             if (vote == null)
                 throw new KeyNotFoundException($"Vote with voting id {votingId} and user id {userId} not found");
@@ -32,7 +32,7 @@ namespace EventPlanner.Repository
         public async Task<string> GetMostPopularVoteOptionAsync(int votingId)
         {
             var vote = await _context.Votes
-                .Where(v => v.VotingId == votingId)
+                .Where(v => v.PollId == votingId)
                 .GroupBy(v => v.VoteOption)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)

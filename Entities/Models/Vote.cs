@@ -9,7 +9,7 @@ namespace EventPlanner.Entities.Models
         public int Id { get; set; }
 
         [Required]
-        public int VotingId { get; set; }
+        public int PollId { get; set; }
 
         [Required]
         public int UserId { get; set; }
@@ -23,7 +23,7 @@ namespace EventPlanner.Entities.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("VoteId")]
-        public virtual required Voting Voting { get; set; }
+        public virtual required Poll Poll { get; set; }
 
         [ForeignKey("UserId")]
         public virtual required User User { get; set; }

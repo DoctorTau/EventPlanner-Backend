@@ -14,7 +14,7 @@ namespace EventPlanner.Data
         public DbSet<TaskItem> TaskItems { get; set; }
         public DbSet<EventDocument> EventDocuments { get; set; }
         public DbSet<Vote> Votes { get; set; }
-        public DbSet<Voting> Votings { get; set; }
+        public DbSet<Poll> Polls { get; set; }
         public DbSet<LLMGeneratedPlan> LLMGeneratedPlans { get; set; }
         public DbSet<UserAvailability> UserAvailabilities { get; set; }
 
@@ -107,9 +107,9 @@ namespace EventPlanner.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Vote>()
-                .HasOne(v => v.Voting)
+                .HasOne(v => v.Poll)
                 .WithMany(voting => voting.Votes)
-                .HasForeignKey(v => v.VotingId)
+                .HasForeignKey(v => v.PollId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -11,7 +11,7 @@ namespace EventPlanner.Data
         DbSet<TaskItem> TaskItems { get; }
         DbSet<EventDocument> EventDocuments { get; }
         DbSet<Vote> Votes { get; }
-        DbSet<Voting> Votings { get; }
+        DbSet<Poll> Polls { get; }
         DbSet<LLMGeneratedPlan> LLMGeneratedPlans { get; }
         DbSet<UserAvailability> UserAvailabilities { get; }
 

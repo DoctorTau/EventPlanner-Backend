@@ -2,11 +2,10 @@ using EventPlanner.Business;
 using EventPlanner.Entities.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration.UserSecrets;
 using TgMiniAppAuth;
 using TgMiniAppAuth.AuthContext;
 
-namespace EventPlanner_Backend.Controllers
+namespace EventPlanner.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

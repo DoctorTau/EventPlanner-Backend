@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using EventPlanner.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entities.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250317013135_ChangeVotingToPoll")]
+    partial class ChangeVotingToPoll
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,9 +296,6 @@ namespace Entities.Migrations
                     b.Property<int?>("EventId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("PollId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
@@ -310,13 +310,16 @@ namespace Entities.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<int>("VotingId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
 
-                    b.HasIndex("PollId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("VotingId");
 
                     b.ToTable("Votes");
                 });
@@ -449,21 +452,21 @@ namespace Entities.Migrations
                         .WithMany("Votes")
                         .HasForeignKey("EventId");
 
-                    b.HasOne("EventPlanner.Entities.Models.Poll", "Poll")
-                        .WithMany("Votes")
-                        .HasForeignKey("PollId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EventPlanner.Entities.Models.User", "User")
                         .WithMany("Votes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Poll");
+                    b.HasOne("EventPlanner.Entities.Models.Poll", "Voting")
+                        .WithMany("Votes")
+                        .HasForeignKey("VotingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
+
+                    b.Navigation("Voting");
                 });
 
             modelBuilder.Entity("EventPlanner.Entities.Models.Event", b =>
