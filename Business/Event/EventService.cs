@@ -82,6 +82,10 @@ namespace EventPlanner.Business
                 Event = @event
             };
 
+            var existingParticipant = await _participantRepository.GetParticipantsByEventIdAsync(eventId);
+            if (existingParticipant.Any(p => p.UserId == participantId))
+                return;
+
             await _participantRepository.CreateAsync(participant);
         }
 

@@ -46,6 +46,19 @@ namespace EventPlanner_Backend.Controllers
                 if (@event == null)
                     return NotFound("Event not found");
 
+                List<UserDto> participantsDto = new List<UserDto>();
+                foreach (var p in @event.Participants)
+                {
+                    var user = await _userService.GetUserAsync(p.UserId);
+                    participantsDto.Add(new UserDto
+                    {
+                        TelegramId = user.TelegramId,
+                        Username = user.Username,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName
+                    });
+                }
+
                 EventWithParticipantsDto eventWithParticipantsDto = new EventWithParticipantsDto
                 {
                     Id = @event.Id,
@@ -54,19 +67,7 @@ namespace EventPlanner_Backend.Controllers
                     EventDate = @event.EventDate,
                     Location = @event.Location,
                     Description = @event.Description,
-                    Participants = (await Task.WhenAll(@event.Participants.Select(
-                        async p =>
-                        {
-                            var user = await _userService.GetUserAsync(p.UserId);
-                            return new UserDto
-                            {
-                                TelegramId = user.TelegramId,
-                                Username = user.Username,
-                                FirstName = user.FirstName,
-                                LastName = user.LastName
-                            };
-                        }
-                    ))).ToList()
+                    Participants = participantsDto
                 };
                 return Ok(eventWithParticipantsDto);
             }
@@ -76,7 +77,7 @@ namespace EventPlanner_Backend.Controllers
             }
         }
 
-        [HttpGet("getByTelegramChatId")]
+        [HttpGet("getByTelegramChatId/{telegramChatId}")]
         public async Task<IActionResult> GetEventByTelegramChatIdAsync(long telegramChatId)
         {
             try
@@ -124,6 +125,26 @@ namespace EventPlanner_Backend.Controllers
                 var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
                 await _eventService.AddParticipantAsync(eventId, user.Id);
                 return Ok("User joined event");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("{eventTgId}/join/{userTgId}")]
+        public async Task<IActionResult> JoinEventAsync(long eventTgId, long userTgId)
+        {
+            try
+            {
+                var @event = await _eventService.GetEventByTelegramChatIdAsync(eventTgId);
+                var user = await _userService.GetUserByTelegramIdAsync(userTgId);
+                await _eventService.AddParticipantAsync(@event.Id, user.Id);
+                return Ok("User joined event");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound("User not found");
             }
             catch (Exception e)
             {
