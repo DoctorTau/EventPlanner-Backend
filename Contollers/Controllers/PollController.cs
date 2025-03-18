@@ -1,6 +1,5 @@
 using EventPlanner.Business;
 using EventPlanner.Entities.Models.Dto;
-using EventPlanner.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventPlanner.Controllers
@@ -24,6 +23,28 @@ namespace EventPlanner.Controllers
                 var poll = await _pollService.CreatePollAsync(pollCreateDto);
                 return Ok(poll);
             }
+            catch (HttpRequestException)
+            {
+                return StatusCode(500, "Failed to create poll in Telegram bot");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("{eventId}/start-date-poll")]
+        public async Task<IActionResult> StartDatePoll(int eventId)
+        {
+            try
+            {
+                var poll = await _pollService.CreateDatePollAsync(eventId);
+                return Ok(poll);
+            }
+            catch (HttpRequestException)
+            {
+                return StatusCode(500, "Failed to create poll in Telegram bot");
+            }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
@@ -44,8 +65,8 @@ namespace EventPlanner.Controllers
             return Ok(votes);
         }
 
-        [HttpPost("{id}/vote")]
-        public async Task<IActionResult> Vote(int id, [FromBody] VoteCreateDto voteCreateDto)
+        [HttpPost("/vote")]
+        public async Task<IActionResult> Vote([FromBody] VoteCreateDto voteCreateDto)
         {
             try
             {

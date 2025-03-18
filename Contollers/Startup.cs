@@ -66,12 +66,14 @@ public class Startup
         services.AddScoped<IUserAvailabilityRepository, UserAvailabilityRepository>();
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
         services.AddScoped<IVoteRepository, VoteRepository>();
+        services.AddScoped<IPollRepository, PollRepository>();
     }
 
     private void ConfigureBusinessServices(IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEventService, EventService>();
+        services.AddScoped<IPollService, PollService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

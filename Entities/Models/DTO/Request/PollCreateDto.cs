@@ -7,6 +7,5 @@ namespace EventPlanner.Entities.Models.Dto
         [Required]
         public int EventId { get; set; }
         public required List<string> Options { get; set; }
-        public VoteType Type { get; set; } = VoteType.Date;
     }
 }
