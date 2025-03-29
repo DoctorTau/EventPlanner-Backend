@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventPlanner.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class PollController : ControllerBase
     {
         private readonly IPollService _pollService;
@@ -65,7 +65,7 @@ namespace EventPlanner.Controllers
             return Ok(votes);
         }
 
-        [HttpPost("/vote")]
+        [HttpPost("vote")]
         public async Task<IActionResult> Vote([FromBody] VoteCreateDto voteCreateDto)
         {
             try

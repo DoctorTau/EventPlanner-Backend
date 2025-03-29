@@ -6,9 +6,10 @@ namespace EventPlanner.Entities.Models.Dto
     {
         public int UserId { get; set; }
         [Required]
-        public int VotingId { get; set; }
+        public int PollId { get; set; }
 
-        public VoteType Type { get; set; } = VoteType.Date;
-        public required string VoteOption { get; set; }
+        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Vote index must be greater than or equal to 0.")]
+        public int VoteIndex { get; set; }
     }
 }

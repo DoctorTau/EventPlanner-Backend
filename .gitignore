@@ -107,3 +107,4 @@ ASALocalRun/
 .env
 
 Contollers/appsettings.Development.json
+Controllers/appsettings.development.json

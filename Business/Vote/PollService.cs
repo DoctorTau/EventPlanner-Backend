@@ -46,7 +46,7 @@ namespace EventPlanner.Business
                 CreatedAt = DateTime.UtcNow,
                 Options = pollCreateDto.Options,
                 Event = await _eventRepository.GetByIdAsync(pollCreateDto.EventId),
-                Votes = []
+                Votes = new List<Vote>()
             };
 
             Event @event = await _eventRepository.GetByIdAsync(pollCreateDto.EventId);
@@ -68,14 +68,13 @@ namespace EventPlanner.Business
                 Votes = []
             };
 
-
             return await SavePollToDbAsync(poll, @event);
         }
 
         private async Task<List<string>> GetOptionsFromDates(int eventId)
         {
             List<Participant> participants = (List<Participant>)await _participantRepository.GetParticipantsByEventIdAsync(eventId);
-            Dictionary<int, List<UserAvailability>> usersAvailabilities = [];
+            Dictionary<int, List<UserAvailability>> usersAvailabilities = new Dictionary<int, List<UserAvailability>>();
             foreach (var participant in participants)
             {
                 User user = await _userRepository.GetByIdAsync(participant.UserId);
@@ -85,7 +84,6 @@ namespace EventPlanner.Business
 
             int totalParticipants = usersAvailabilities.Count;
 
-            // Group availability by date
             var dateGroups = usersAvailabilities
                 .SelectMany(kv => kv.Value.Select(ua => new { kv.Key, ua.AvailableDate }))
                 .GroupBy(x => x.AvailableDate)
@@ -94,21 +92,17 @@ namespace EventPlanner.Business
                 .ThenBy(g => g.Date)
                 .ToList();
 
-            // Get dates with all participants
             var commonDates = dateGroups.Where(dg => dg.UserCount == totalParticipants).ToList();
 
-            // If more than 7 dates with all participants, pick first 7
             if (commonDates.Count >= 7)
                 return commonDates.Take(7).Select(d => d.Date.ToString("yyyy MM dd")).ToList();
 
 
-            // If dates less than 2, reduce threshold to 80%
             if (commonDates.Count < 2)
             {
                 int threshold80 = (int)Math.Ceiling(totalParticipants * 0.8);
                 commonDates = dateGroups.Where(dg => dg.UserCount >= threshold80).ToList();
 
-                // If still fewer than 3, reduce threshold to 50%
                 if (commonDates.Count < 2)
                 {
                     int threshold50 = (int)Math.Ceiling(totalParticipants * 0.5);
@@ -116,7 +110,6 @@ namespace EventPlanner.Business
                 }
             }
 
-            // Take closest 7 dates or fewer
             return commonDates.Take(7).Select(d => d.Date.ToString("yyyy MM dd")).ToList();
         }
 
@@ -156,15 +149,18 @@ namespace EventPlanner.Business
 
         public async Task<Vote> CreateVoteAsync(VoteCreateDto voteCreateDto)
         {
+            User user = await _userRepository.GetUserByTelegramIdAsync(voteCreateDto.UserId)
+                         ?? throw new Exception($"User with tg id {voteCreateDto.UserId} not found");
+            Poll poll = await _pollRepository.GetByIdAsync(voteCreateDto.PollId)
+                         ?? throw new Exception($"Poll with id {voteCreateDto.PollId} not found");
             Vote vote = new()
             {
-                PollId = voteCreateDto.VotingId,
-                UserId = voteCreateDto.UserId,
-                Type = voteCreateDto.Type,
+                PollId = voteCreateDto.PollId,
+                UserId = user.Id,
                 CreatedAt = DateTime.UtcNow,
-                VoteOption = voteCreateDto.VoteOption,
-                Poll = await _pollRepository.GetByIdAsync(voteCreateDto.VotingId),
-                User = await _userRepository.GetByIdAsync(voteCreateDto.UserId)
+                VoteOption = poll.Options[voteCreateDto.VoteIndex],
+                Poll = poll,
+                User = user
             };
 
             await _voteRepository.CreateAsync(vote);

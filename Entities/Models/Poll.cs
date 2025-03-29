@@ -14,9 +14,6 @@ namespace EventPlanner.Entities.Models
         [Required]
         public required List<string> Options { get; set; }
 
-        [Required]
-        public VoteType Type { get; set; } = VoteType.Date;
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("EventId")]
@@ -25,9 +22,4 @@ namespace EventPlanner.Entities.Models
         public virtual required ICollection<Vote> Votes { get; set; }
     }
 
-    public enum VoteType
-    {
-        Date,
-        Location
-    }
 }

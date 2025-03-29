@@ -28,7 +28,6 @@ namespace EventPlanner.Controllers
             try
             {
                 var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
-                // Log that user has logged in
                 return Ok("User authenticated");
             }
             catch (KeyNotFoundException)
