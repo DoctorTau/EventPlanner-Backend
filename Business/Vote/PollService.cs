@@ -71,6 +71,9 @@ namespace EventPlanner.Business
             await SavePollToDbAsync(poll, @event);
 
             await StartPollAsync(poll.Id);
+
+            @event.TimeVotingId = poll.Id;
+            await _eventRepository.UpdateAsync(@event);
             return poll;
         }
 
@@ -152,7 +155,6 @@ namespace EventPlanner.Business
 
         }
 
-
         private async Task SendVoteCreationRequestAsync(BotPollCreateDto botPollCreateDto)
         {
             using var httpClient = new HttpClient();
@@ -184,6 +186,55 @@ namespace EventPlanner.Business
             return vote;
         }
 
+        public async Task<Poll> CreateLocationPollAsync(int eventId)
+        {
+            Event @event = await _eventRepository.GetByIdAsync(eventId);
+            if (@event.PlaceVotingId != null)
+                throw new Exception($"Event with id {eventId} already has a location poll");
+
+            Poll poll = new()
+            {
+                EventId = eventId,
+                CreatedAt = DateTime.UtcNow,
+                Options = new List<string>(),
+                Event = @event,
+                Votes = new List<Vote>()
+            };
+
+            await SavePollToDbAsync(poll, @event);
+            @event.PlaceVotingId = poll.Id;
+            await _eventRepository.UpdateAsync(@event);
+
+            return poll;
+        }
+
+        public async Task<Poll> AddOptionAsync(int pollId, string option)
+        {
+            Poll poll = await _pollRepository.GetByIdAsync(pollId)
+                         ?? throw new Exception($"Poll with id {pollId} not found");
+            if (poll.Status == PollStatus.Open)
+                throw new Exception($"Poll with id {pollId} is already open");
+
+            // Add option if it doesn't exist
+            if (!poll.Options.Contains(option))
+            {
+                poll.Options.Add(option);
+                await _pollRepository.UpdateAsync(poll);
+            }
+            return poll;
+        }
+
+        public async Task<Poll> GetLocationPollAsync(int eventId)
+        {
+            Event @event = await _eventRepository.GetByIdAsync(eventId)
+                         ?? throw new Exception($"Event with id {eventId} not found");
+            if (@event.PlaceVotingId == null)
+                throw new KeyNotFoundException($"Event with id {eventId} has no location poll");
+            Poll poll = await _pollRepository.GetByIdAsync(@event.PlaceVotingId.Value)
+                         ?? throw new KeyNotFoundException($"Poll with id {@event.PlaceVotingId} not found");
+            return poll;
+        }
+
         public async Task DeleteVoteAsync(int voteId)
         {
             var vote = await _voteRepository.GetByIdAsync(voteId)
@@ -206,18 +257,11 @@ namespace EventPlanner.Business
             return mostVotedOption;
         }
 
-        public async Task<Poll> GetPollByEventIdAsync(int eventId)
+        public async Task<List<Vote>> GetVotesAsync(int pollId)
         {
-            var poll = await _pollRepository.GetPollByEventIdAsync(eventId);
-
-            return poll;
+            var votes = await _voteRepository.GetVotesByPollAsync(pollId);
+            return votes.ToList();
         }
-
-        public async Task<List<Vote>> GetVotesAsync(int eventId)
-        {
-            return await _pollRepository.GetVotesAsync(eventId);
-        }
-
     }
 
     internal class BotPollCreateDto

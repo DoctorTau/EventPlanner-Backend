@@ -14,7 +14,7 @@ namespace EventPlanner.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Vote>> GetVotesByVotingAsync(int votingId)
+        public async Task<IEnumerable<Vote>> GetVotesByPollAsync(int votingId)
         {
             return await _context.Votes.Where(v => v.PollId == votingId).ToListAsync();
         }

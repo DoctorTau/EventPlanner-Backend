@@ -5,6 +5,5 @@ namespace EventPlanner.Repository
     public interface IPollRepository : IRepository<Poll>
     {
         Task<List<Vote>> GetVotesAsync(int eventId);
-        Task<Poll> GetPollByEventIdAsync(int eventId);
     }
 }

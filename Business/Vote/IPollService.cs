@@ -7,10 +7,13 @@ namespace EventPlanner.Business
     {
         Task<Poll> CreatePollAsync(PollCreateDto pollCreateDto);
         Task<Poll> CreateDatePollAsync(int eventId);
+        Task<Poll> CreateLocationPollAsync(int eventId);
         Task<Vote> CreateVoteAsync(VoteCreateDto voteCreateDto);
 
-        Task<Poll> GetPollByEventIdAsync(int eventId);
-        Task<List<Vote>> GetVotesAsync(int eventId);
+        Task<Poll> GetLocationPollAsync(int eventId);
+        Task<Poll> AddOptionAsync(int pollId, string option);
+
+        Task<List<Vote>> GetVotesAsync(int pollId);
 
         Task<string> GetMostVotedOptionAsync(int voteId);
     }

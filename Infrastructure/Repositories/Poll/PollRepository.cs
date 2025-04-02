@@ -41,14 +41,6 @@ namespace EventPlanner.Repository
             return voting;
         }
 
-        public async Task<Poll> GetPollByEventIdAsync(int eventId)
-        {
-            var poll = await _context.Polls.FirstOrDefaultAsync(p => p.EventId == eventId);
-            if (poll == null || poll.EventId != eventId)
-                throw new KeyNotFoundException($"Poll with event id {eventId} not found");
-            return poll;
-        }
-
         public async Task<List<Vote>> GetVotesAsync(int eventId)
         {
             return await _context.Votes.Where(v => v.PollId == eventId).ToListAsync();
