@@ -16,10 +16,19 @@ namespace EventPlanner.Entities.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public PollStatus Status { get; set; } = PollStatus.Pending;
+
         [ForeignKey("EventId")]
         public virtual required Event Event { get; set; }
 
         public virtual required ICollection<Vote> Votes { get; set; }
+    }
+
+    public enum PollStatus
+    {
+        Pending,
+        Open,
+        Closed
     }
 
 }
