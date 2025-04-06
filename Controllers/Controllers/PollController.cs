@@ -28,12 +28,12 @@ namespace EventPlanner.Controllers
             try
             {
                 var poll = await _pollService.GetLocationPollAsync(eventId);
-                return Ok(MapPollToDto(poll));
+                return Ok(new PollCreateDto(poll));
             }
             catch (KeyNotFoundException)
             {
                 var poll = await _pollService.CreateLocationPollAsync(eventId);
-                return Ok(MapPollToDto(poll));
+                return Ok(new PollCreateDto(poll));
             }
             catch (HttpRequestException)
             {
@@ -62,7 +62,26 @@ namespace EventPlanner.Controllers
                     return NotFound("Poll not found");
                 }
                 var updatedPoll = await _pollService.AddOptionAsync(poll.Id, location);
-                return Ok(MapPollToDto(updatedPoll));
+                return Ok(new PollCreateDto(updatedPoll));
+            }
+            catch (HttpRequestException)
+            {
+                return StatusCode(500, "Failed to create poll in Telegram bot");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("{pollId}/start-poll")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<IActionResult> StartPoll(int pollId)
+        {
+            try
+            {
+                var poll = await _pollService.StartPollAsync(pollId) ?? throw new KeyNotFoundException("Poll not found");
+                return Ok(new PollCreateDto(poll));
             }
             catch (HttpRequestException)
             {
@@ -113,15 +132,6 @@ namespace EventPlanner.Controllers
             {
                 return BadRequest(e.Message);
             }
-        }
-
-        private PollCreateDto MapPollToDto(Poll poll)
-        {
-            return new PollCreateDto
-            {
-                EventId = poll.EventId,
-                Options = poll.Options
-            };
         }
     }
 }

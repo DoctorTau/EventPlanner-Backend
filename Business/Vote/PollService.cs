@@ -70,7 +70,7 @@ namespace EventPlanner.Business
 
             await SavePollToDbAsync(poll, @event);
 
-            await StartPollAsync(poll.Id);
+            await StartInChatPollAsync(poll.Id);
 
             @event.TimeVotingId = poll.Id;
             await _eventRepository.UpdateAsync(@event);
@@ -126,19 +126,21 @@ namespace EventPlanner.Business
             return createdPoll;
         }
 
-        private async Task StartPollAsync(int pollId)
+        private async Task StartInChatPollAsync(int pollId)
         {
             Poll poll = await _pollRepository.GetByIdAsync(pollId)
                          ?? throw new Exception($"Poll with id {pollId} not found");
             if (poll.Status == PollStatus.Open)
                 throw new Exception($"Poll with id {pollId} is already open");
+            Event @event = await _eventRepository.GetByIdAsync(poll.EventId)
+                         ?? throw new Exception($"Event with id {poll.EventId} not found");
 
 
             BotPollCreateDto botPollCreateDto = new()
             {
                 votingId = poll.Id,
                 options = poll.Options,
-                chatId = poll.Event.TelegramChatId
+                chatId = @event.TelegramChatId
             };
             try
             {
@@ -151,8 +153,6 @@ namespace EventPlanner.Business
 
             poll.Status = PollStatus.Open;
             await _pollRepository.UpdateAsync(poll);
-
-
         }
 
         private async Task SendVoteCreationRequestAsync(BotPollCreateDto botPollCreateDto)
@@ -261,6 +261,13 @@ namespace EventPlanner.Business
         {
             var votes = await _voteRepository.GetVotesByPollAsync(pollId);
             return votes.ToList();
+        }
+
+        public async Task<Poll> StartPollAsync(int pollId)
+        {
+            await StartInChatPollAsync(pollId);
+            return await _pollRepository.GetByIdAsync(pollId)
+                   ?? throw new Exception($"Poll with id {pollId} not found");
         }
     }
 

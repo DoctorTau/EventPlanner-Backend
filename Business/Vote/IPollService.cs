@@ -16,5 +16,6 @@ namespace EventPlanner.Business
         Task<List<Vote>> GetVotesAsync(int pollId);
 
         Task<string> GetMostVotedOptionAsync(int voteId);
+        Task<Poll> StartPollAsync(int pollId);
     }
 }
