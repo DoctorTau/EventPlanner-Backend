@@ -172,6 +172,12 @@ namespace EventPlanner.Business
                          ?? throw new Exception($"User with tg id {voteCreateDto.UserId} not found");
             Poll poll = await _pollRepository.GetByIdAsync(voteCreateDto.PollId)
                          ?? throw new Exception($"Poll with id {voteCreateDto.PollId} not found");
+
+            if (poll.Status != PollStatus.Open)
+            {
+                throw new Exception($"Poll with id {voteCreateDto.PollId} is not open");
+            }
+
             Vote vote = new()
             {
                 PollId = voteCreateDto.PollId,
@@ -182,8 +188,51 @@ namespace EventPlanner.Business
                 User = user
             };
 
-            await _voteRepository.CreateAsync(vote);
+            try
+            {
+                await _voteRepository.CreateAsync(vote);
+                await CountVoteAsync(vote);
+            }
+            catch
+            {
+                await _voteRepository.DeleteAsync(vote);
+                throw new Exception($"Failed to create vote for user with id {user.Id}");
+            }
             return vote;
+        }
+
+        private async Task CountVoteAsync(Vote vote)
+        {
+            Poll poll = await _pollRepository.GetByIdAsync(vote.PollId)
+                         ?? throw new Exception($"Poll with id {vote.PollId} not found");
+            Event votedEvent = await _eventRepository.GetByIdAsync(poll.EventId)
+                         ?? throw new Exception($"Event with id {poll.EventId} not found");
+
+            if (votedEvent.TimeVotingId == poll.Id)
+            {
+                var mostVotedOption = await GetMostVotedOptionAsync(poll.Id);
+                Console.WriteLine("Most voted option: " + mostVotedOption);
+
+                if (!DateTime.TryParseExact(mostVotedOption, "yyyy MM dd", null, System.Globalization.DateTimeStyles.None, out var dateTime))
+                {
+                    throw new Exception($"Failed to parse the most voted option '{mostVotedOption}' as a date.");
+                }
+
+                dateTime = dateTime.ToUniversalTime();
+                Console.WriteLine($"Parsed date: {dateTime}");
+                votedEvent.EventDate = dateTime;
+            }
+            else if (votedEvent.PlaceVotingId == poll.Id)
+            {
+                var mostVotedOption = await GetMostVotedOptionAsync(poll.Id);
+                votedEvent.Location = mostVotedOption;
+            }
+            else
+            {
+                throw new Exception($"Poll with id {poll.Id} is not related to the event with id {votedEvent.Id}");
+            }
+
+            await _eventRepository.UpdateAsync(votedEvent);
         }
 
         public async Task<Poll> CreateLocationPollAsync(int eventId)
