@@ -72,7 +72,7 @@ namespace EventPlanner.Business
 
             await StartInChatPollAsync(poll.Id);
 
-            @event.TimeVotingId = poll.Id;
+            @event.TimePollId = poll.Id;
             await _eventRepository.UpdateAsync(@event);
             return poll;
         }
@@ -208,12 +208,12 @@ namespace EventPlanner.Business
             Event votedEvent = await _eventRepository.GetByIdAsync(poll.EventId)
                          ?? throw new Exception($"Event with id {poll.EventId} not found");
 
-            if (votedEvent.TimeVotingId == poll.Id)
+            if (votedEvent.TimePollId == poll.Id)
             {
                 var mostVotedOption = await GetMostVotedOptionAsync(poll.Id);
                 Console.WriteLine("Most voted option: " + mostVotedOption);
 
-                if (!DateTime.TryParseExact(mostVotedOption, "yyyy MM dd", null, System.Globalization.DateTimeStyles.None, out var dateTime))
+                if (!DateTime.TryParseExact(mostVotedOption, new[] { "yyyy MM dd", "yyyy-MM-dd", "yyyy/MM/dd" }, null, System.Globalization.DateTimeStyles.None, out var dateTime))
                 {
                     throw new Exception($"Failed to parse the most voted option '{mostVotedOption}' as a date.");
                 }
@@ -222,7 +222,7 @@ namespace EventPlanner.Business
                 Console.WriteLine($"Parsed date: {dateTime}");
                 votedEvent.EventDate = dateTime;
             }
-            else if (votedEvent.PlaceVotingId == poll.Id)
+            else if (votedEvent.LocationPollId == poll.Id)
             {
                 var mostVotedOption = await GetMostVotedOptionAsync(poll.Id);
                 votedEvent.Location = mostVotedOption;
@@ -238,7 +238,7 @@ namespace EventPlanner.Business
         public async Task<Poll> CreateLocationPollAsync(int eventId)
         {
             Event @event = await _eventRepository.GetByIdAsync(eventId);
-            if (@event.PlaceVotingId != null)
+            if (@event.LocationPollId != null)
                 throw new Exception($"Event with id {eventId} already has a location poll");
 
             Poll poll = new()
@@ -251,7 +251,7 @@ namespace EventPlanner.Business
             };
 
             await SavePollToDbAsync(poll, @event);
-            @event.PlaceVotingId = poll.Id;
+            @event.LocationPollId = poll.Id;
             await _eventRepository.UpdateAsync(@event);
 
             return poll;
@@ -277,10 +277,10 @@ namespace EventPlanner.Business
         {
             Event @event = await _eventRepository.GetByIdAsync(eventId)
                          ?? throw new Exception($"Event with id {eventId} not found");
-            if (@event.PlaceVotingId == null)
+            if (@event.LocationPollId == null)
                 throw new KeyNotFoundException($"Event with id {eventId} has no location poll");
-            Poll poll = await _pollRepository.GetByIdAsync(@event.PlaceVotingId.Value)
-                         ?? throw new KeyNotFoundException($"Poll with id {@event.PlaceVotingId} not found");
+            Poll poll = await _pollRepository.GetByIdAsync(@event.LocationPollId.Value)
+                         ?? throw new KeyNotFoundException($"Poll with id {@event.LocationPollId} not found");
             return poll;
         }
 

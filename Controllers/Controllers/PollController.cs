@@ -1,5 +1,4 @@
 using EventPlanner.Business;
-using EventPlanner.Entities.Models;
 using EventPlanner.Entities.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

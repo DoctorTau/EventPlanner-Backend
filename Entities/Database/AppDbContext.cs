@@ -95,15 +95,15 @@ namespace EventPlanner.Data
                 .HasKey(ua => new { ua.UserId, ua.AvailableDate });
 
             modelBuilder.Entity<Event>()
-                .HasOne(e => e.TimeVoting)
+                .HasOne(e => e.TimePoll)
                 .WithOne()
-                .HasForeignKey<Event>(e => e.TimeVotingId)
+                .HasForeignKey<Event>(e => e.TimePollId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Event>()
-                .HasOne(e => e.PlaceVoting)
+                .HasOne(e => e.LocationPoll)
                 .WithOne()
-                .HasForeignKey<Event>(e => e.PlaceVotingId)
+                .HasForeignKey<Event>(e => e.LocationPollId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Vote>()

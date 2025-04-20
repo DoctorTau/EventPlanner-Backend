@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using EventPlanner.Business;
 using EventPlanner.Entities.Models;
 using EventPlanner.Entities.Models.Dto;
@@ -6,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using TgMiniAppAuth;
 using TgMiniAppAuth.AuthContext;
 
-namespace EventPlanner_Backend.Controllers
+namespace EventPlanner.Controllers.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -109,6 +111,31 @@ namespace EventPlanner_Backend.Controllers
                     Description = e.Description
                 }).ToList();
                 return Ok(eventsDto);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("getEventTypes")]
+        public ActionResult<List<object>> GetEventTypes()
+        {
+            try
+            {
+                var eventTypes = Enum.GetValues(typeof(GroupEventType))
+                    .Cast<GroupEventType>()
+                    .Select(e => new
+                    {
+                        value = e.ToString(),
+                        displayName = e.GetType()
+                                       .GetMember(e.ToString())
+                                       .First()
+                                       .GetCustomAttribute<DisplayAttribute>()?.Name ?? e.ToString()
+                    })
+                    .ToList<object>();
+
+                return Ok(eventTypes);
             }
             catch (Exception e)
             {
