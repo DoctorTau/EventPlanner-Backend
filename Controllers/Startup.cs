@@ -74,6 +74,8 @@ public class Startup
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IPollService, PollService>();
+        services.AddScoped<IPlanGenerator, PlanGenerator>();
+        services.AddHttpClient();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

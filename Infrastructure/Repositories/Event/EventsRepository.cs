@@ -75,6 +75,7 @@ namespace EventPlanner.Repository
             var @event = await _dbContext.Events
                 .Include(e => e.Participants)
                 .Include(e => e.Tasks)
+                .Include(e => e.GeneratedPlans)
                 .FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (@event == null)

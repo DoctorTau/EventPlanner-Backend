@@ -178,5 +178,21 @@ namespace EventPlanner.Controllers.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("{eventId}/generatePlan")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<IActionResult> GeneratePlanAsync(int eventId, [FromBody] string prompt)
+        {
+            try
+            {
+                var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
+                var @event = await _eventService.GeneratePlanAsync(eventId, user.Id, prompt);
+                return Ok(@event);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

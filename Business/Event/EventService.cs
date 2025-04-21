@@ -9,14 +9,17 @@ namespace EventPlanner.Business
         private readonly IEventsRepository _eventRepository;
         private readonly IUserRepository _userRepository;
         private readonly IParticipantRepository _participantRepository;
+        private readonly IPlanGenerator _planGenerator;
 
         public EventService(IEventsRepository eventRepository,
                             IUserRepository userRepository,
-                            IParticipantRepository participantRepository)
+                            IParticipantRepository participantRepository,
+                            IPlanGenerator planGenerator)
         {
             _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _participantRepository = participantRepository ?? throw new ArgumentNullException(nameof(participantRepository));
+            _planGenerator = planGenerator ?? throw new ArgumentNullException(nameof(planGenerator));
         }
 
 
@@ -98,5 +101,33 @@ namespace EventPlanner.Business
         {
             return _eventRepository.GetEventWithDetailsAsync(eventId);
         }
+
+        public async Task<Event> GeneratePlanAsync(int eventId, int userId, string prompt)
+        {
+            var eventToCreatePlan = await _eventRepository.GetEventWithDetailsAsync(eventId);
+            if (eventToCreatePlan == null)
+                throw new KeyNotFoundException("Event not found");
+            
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+
+            Console.WriteLine($"Generating plan for event: {eventToCreatePlan.Title} with prompt: {prompt}");
+
+            var planText = await _planGenerator.GeneratePlanAsync(eventToCreatePlan, prompt);
+            LLMGeneratedPlan generatedPlan = new()
+            {
+                EventId = eventId,
+                PlanText = planText,
+                CreatedAt = DateTime.UtcNow,
+                Event = eventToCreatePlan,
+                Generator = user
+            };
+
+            eventToCreatePlan.GeneratedPlans.Add(generatedPlan);
+
+            return await _eventRepository.UpdateAsync(eventToCreatePlan);
+        }
+
     }
 }

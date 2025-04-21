@@ -11,6 +11,7 @@ namespace EventPlanner.Business
         Task UpdateEventDateAsync(int eventId, DateTime selectedDate);
         Task UpdateEventLocationAsync(int eventId, string selectedLocation);
         Task AddParticipantAsync(int eventId, int participantId);
+        Task<Event> GeneratePlanAsync(int eventId, int userId, string prompt);
         Task<List<Event>> GetAllUsersEventsAsync(int userId);
     }
 }
