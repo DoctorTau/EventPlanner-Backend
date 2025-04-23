@@ -52,6 +52,15 @@ namespace EventPlanner.Business
             return await _eventRepository.GetByTelegramChatIdAsync(telegramChatId);
         }
 
+        public async Task<Event> GetEventWithAllDetailsAsync(int eventId)
+        {
+            var @event = await _eventRepository.GetEventWithDetailsAsync(eventId);
+            if (@event == null)
+                throw new KeyNotFoundException("Event not found");
+
+            return @event;
+        }
+
         public async Task UpdateEventDateAsync(int eventId, DateTime selectedDate)
         {
             var eventToUpdate = await _eventRepository.GetByIdAsync(eventId);
@@ -107,7 +116,7 @@ namespace EventPlanner.Business
             var eventToCreatePlan = await _eventRepository.GetEventWithDetailsAsync(eventId);
             if (eventToCreatePlan == null)
                 throw new KeyNotFoundException("Event not found");
-            
+
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new KeyNotFoundException("User not found");

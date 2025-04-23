@@ -7,6 +7,7 @@ namespace EventPlanner.Business
     {
         Task<Event> CreateEventAsync(EventCreateDto newEvent);
         Task<Event> GetEventWithParticipantsAsync(int eventId);
+        Task<Event> GetEventWithAllDetailsAsync(int eventId);
         Task<Event> GetEventByTelegramChatIdAsync(long telegramChatId);
         Task UpdateEventDateAsync(int eventId, DateTime selectedDate);
         Task UpdateEventLocationAsync(int eventId, string selectedLocation);

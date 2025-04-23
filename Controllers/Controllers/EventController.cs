@@ -118,6 +118,27 @@ namespace EventPlanner.Controllers.Controllers
             }
         }
 
+        [HttpGet("{eventId}/getEventPlan")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<ActionResult<string>> GetEventPlanAsync(int eventId)
+        {
+            try
+            {
+                var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
+                var @event = await _eventService.GetEventWithAllDetailsAsync(eventId);
+                if (@event == null)
+                    return NotFound("Event not found");
+                if (@event.Participants.All(p => p.UserId != user.Id))
+                    return BadRequest("User is not a participant of this event");
+
+                return Ok(@event.GeneratedPlans.Last().PlanText);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("getEventTypes")]
         public ActionResult<List<object>> GetEventTypes()
         {
