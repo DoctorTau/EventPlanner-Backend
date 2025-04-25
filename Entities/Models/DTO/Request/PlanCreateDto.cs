@@ -23,4 +23,10 @@ namespace EventPlanner.Entities.Models.Dto
             user_prompt = prompt;
         }
     }
+
+    public class PlanUpdateDto
+    {
+        public required string original_plan { get; set; }
+        public required string user_comment { get; set; }
+    }
 }

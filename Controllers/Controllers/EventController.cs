@@ -131,6 +131,9 @@ namespace EventPlanner.Controllers.Controllers
                 if (@event.Participants.All(p => p.UserId != user.Id))
                     return BadRequest("User is not a participant of this event");
 
+                if (@event.GeneratedPlans.Count == 0)
+                    return NotFound("No plans generated for this event");
+
                 return Ok(@event.GeneratedPlans.Last().PlanText);
             }
             catch (Exception e)
@@ -209,6 +212,30 @@ namespace EventPlanner.Controllers.Controllers
                 var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
                 var @event = await _eventService.GeneratePlanAsync(eventId, user.Id, prompt);
                 return Ok(@event);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("{eventId}/updatePlan")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<IActionResult> UpdatePlanAsync(int eventId, [FromBody] PlanUpdateDto planUpdateDto)
+        {
+            try
+            {
+                var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
+                var @event = await _eventService.ModifyPlanAsync(eventId, user.Id, planUpdateDto.original_plan, planUpdateDto.user_comment);
+                return Ok(@event.GeneratedPlans.Last().PlanText);
             }
             catch (Exception e)
             {

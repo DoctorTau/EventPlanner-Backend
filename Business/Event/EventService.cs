@@ -121,7 +121,8 @@ namespace EventPlanner.Business
             if (user == null)
                 throw new KeyNotFoundException("User not found");
 
-            Console.WriteLine($"Generating plan for event: {eventToCreatePlan.Title} with prompt: {prompt}");
+            if (eventToCreatePlan.Participants.All(p => p.UserId != userId))
+                throw new InvalidOperationException("User is not a participant of this event");
 
             var planText = await _planGenerator.GeneratePlanAsync(eventToCreatePlan, prompt);
             LLMGeneratedPlan generatedPlan = new()
@@ -138,5 +139,32 @@ namespace EventPlanner.Business
             return await _eventRepository.UpdateAsync(eventToCreatePlan);
         }
 
+        public async Task<Event> ModifyPlanAsync(int eventId, int userId, string planToModify, string prompt)
+        {
+            var eventToModifyPlan = await _eventRepository.GetEventWithDetailsAsync(eventId);
+            if (eventToModifyPlan == null)
+                throw new KeyNotFoundException("Event not found");
+
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+
+            if (eventToModifyPlan.Participants.All(p => p.UserId != userId))
+                throw new InvalidOperationException("User is not a participant of this event");
+
+            var modifiedPlanText = await _planGenerator.ModifyPlanAsync(eventToModifyPlan, planToModify, prompt);
+            LLMGeneratedPlan modifiedPlan = new()
+            {
+                EventId = eventId,
+                PlanText = modifiedPlanText,
+                CreatedAt = DateTime.UtcNow,
+                Event = eventToModifyPlan,
+                Generator = user
+            };
+
+            eventToModifyPlan.GeneratedPlans.Add(modifiedPlan);
+
+            return await _eventRepository.UpdateAsync(eventToModifyPlan);
+        }
     }
 }

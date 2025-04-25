@@ -47,7 +47,33 @@ namespace EventPlanner.Business
 
         public async Task<string> ModifyPlanAsync(Event eventToModifyPlan, string planToModify, string prompt)
         {
-            throw new NotImplementedException("ModifyPlanAsync is not implemented yet.");
+            try
+            {
+                Console.WriteLine($"Event to modify plan: {eventToModifyPlan}");
+                PlanUpdateDto planModifyDto = new PlanUpdateDto
+                {
+                    original_plan = planToModify,
+                    user_comment = prompt
+                };
+
+                var response = await _httpClient.PostAsJsonAsync($"{_llmServiceUrl}/plan/update-plan", planModifyDto);
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                    throw new Exception($"Error from LLM service: {response.ReasonPhrase}");
+                }
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log the exception (not implemented here)
+                throw new Exception("Error while calling LLM service", ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+                throw new Exception("An unexpected error occurred", ex);
+            }
         }
     }
 }

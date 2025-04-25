@@ -13,6 +13,7 @@ namespace EventPlanner.Business
         Task UpdateEventLocationAsync(int eventId, string selectedLocation);
         Task AddParticipantAsync(int eventId, int participantId);
         Task<Event> GeneratePlanAsync(int eventId, int userId, string prompt);
+        Task<Event> ModifyPlanAsync(int eventId, int userId, string planToModify, string prompt);
         Task<List<Event>> GetAllUsersEventsAsync(int userId);
     }
 }
