@@ -61,16 +61,7 @@ namespace EventPlanner.Controllers.Controllers
                     });
                 }
 
-                EventWithParticipantsDto eventWithParticipantsDto = new EventWithParticipantsDto
-                {
-                    Id = @event.Id,
-                    Title = @event.Title,
-                    TelegramChatId = @event.TelegramChatId,
-                    EventDate = @event.EventDate,
-                    Location = @event.Location,
-                    Description = @event.Description,
-                    Participants = participantsDto
-                };
+                EventWithParticipantsDto eventWithParticipantsDto = new EventWithParticipantsDto(@event, participantsDto);
                 return Ok(eventWithParticipantsDto);
             }
             catch (Exception e)
@@ -101,15 +92,8 @@ namespace EventPlanner.Controllers.Controllers
             {
                 var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
                 var events = await _eventService.GetAllUsersEventsAsync(user.Id);
-                List<EventResponseDto> eventsDto = events.Select(e => new EventResponseDto
-                {
-                    Id = e.Id,
-                    Title = e.Title,
-                    TelegramChatId = e.TelegramChatId,
-                    EventDate = e.EventDate,
-                    Location = e.Location,
-                    Description = e.Description
-                }).ToList();
+                List<EventResponseDto> eventsDto = events.Select(e => new EventResponseDto(e)
+                ).ToList();
                 return Ok(eventsDto);
             }
             catch (Exception e)
@@ -142,6 +126,27 @@ namespace EventPlanner.Controllers.Controllers
             }
         }
 
+        [HttpPut("{eventId}/updateEventDetails")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<IActionResult> UpdateEventDetailsAsync(int eventId, [FromBody] EventUpdateDto eventUpdateDto)
+        {
+            try
+            {
+                var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
+                var @event = await _eventService.GetEventWithAllDetailsAsync(eventId);
+                if (@event == null)
+                    return NotFound("Event not found");
+                if (@event.Participants.All(p => p.UserId != user.Id))
+                    return BadRequest("User is not a participant of this event");
+
+                return Ok(await _eventService.UpdateEventAsync(eventId, eventUpdateDto));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("getEventTypes")]
         public ActionResult<List<object>> GetEventTypes()
         {
@@ -166,6 +171,7 @@ namespace EventPlanner.Controllers.Controllers
                 return BadRequest(e.Message);
             }
         }
+
 
         [HttpPost("{eventId}/join")]
         [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]

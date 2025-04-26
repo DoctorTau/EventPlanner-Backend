@@ -52,6 +52,24 @@ namespace EventPlanner.Business
             return await _eventRepository.GetByTelegramChatIdAsync(telegramChatId);
         }
 
+        public async Task<Event> UpdateEventAsync(int eventId, EventUpdateDto eventUpdateDto)
+        {
+            var eventToUpdate = await _eventRepository.GetByIdAsync(eventId);
+            if (eventToUpdate == null)
+                throw new KeyNotFoundException("Event not found");
+
+            if (eventUpdateDto.Title != null && eventUpdateDto.Title != string.Empty)
+                eventToUpdate.Title = eventUpdateDto.Title;
+
+            if (eventUpdateDto.Description != null && eventUpdateDto.Description != string.Empty)
+                eventToUpdate.Description = eventUpdateDto.Description;
+
+            if (eventUpdateDto.EventType != null && eventUpdateDto.EventType != GroupEventType.None)
+                eventToUpdate.EventType = eventUpdateDto.EventType.Value;
+
+            return await _eventRepository.UpdateAsync(eventToUpdate);
+        }
+
         public async Task<Event> GetEventWithAllDetailsAsync(int eventId)
         {
             var @event = await _eventRepository.GetEventWithDetailsAsync(eventId);
