@@ -17,7 +17,7 @@ namespace EventPlanner.Entities.Models
         public required string Title { get; set; }
 
         [Required]
-        public TaskStatus Status { get; set; } = TaskStatus.Pending;
+        public TaskItemStatus Status { get; set; } = TaskItemStatus.Pending;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -25,13 +25,16 @@ namespace EventPlanner.Entities.Models
         public virtual required Event Event { get; set; }
 
         [ForeignKey("AssignedTo")]
-        public virtual required User Assignee { get; set; }
+        public virtual required User? Assignee { get; set; } = null;
     }
 
-    public enum TaskStatus
+    public enum TaskItemStatus
     {
+        [Display(Name = "Pending")]
         Pending,
+        [Display(Name = "In Progress")]
         InProgress,
+        [Display(Name = "Completed")]
         Completed
     }
 }

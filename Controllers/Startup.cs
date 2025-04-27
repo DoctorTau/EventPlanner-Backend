@@ -67,6 +67,7 @@ public class Startup
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
         services.AddScoped<IVoteRepository, VoteRepository>();
         services.AddScoped<IPollRepository, PollRepository>();
+        services.AddScoped<IRepository<EventPlanner.Entities.Models.TaskItem>, TaskRepository>();
     }
 
     private void ConfigureBusinessServices(IServiceCollection services)
@@ -75,6 +76,7 @@ public class Startup
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IPlanGenerator, PlanGenerator>();
+        services.AddScoped<ITaskService, TaskService>();
         services.AddHttpClient();
     }
 

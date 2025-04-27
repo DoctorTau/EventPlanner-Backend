@@ -54,6 +54,7 @@ namespace EventPlanner.Controllers.Controllers
                     var user = await _userService.GetUserAsync(p.UserId);
                     participantsDto.Add(new UserDto
                     {
+                        Id = user.Id,
                         TelegramId = user.TelegramId,
                         Username = user.Username,
                         FirstName = user.FirstName,

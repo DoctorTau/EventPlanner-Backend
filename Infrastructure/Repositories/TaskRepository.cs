@@ -29,14 +29,22 @@ namespace EventPlanner.Repository
 
         public async Task<List<TaskItem>> GetAllAsync()
         {
-            return await _context.TaskItems.ToListAsync();
+            return await _context.TaskItems.Include(
+                t => t.Assignee
+            ).Include(
+                t => t.Event
+            ).ToListAsync();
         }
 
         public async Task<TaskItem> GetByIdAsync(int id)
         {
-            var entity = await _context.TaskItems.FindAsync(id);
+            var entity = await _context.TaskItems.Include(
+                t => t.Assignee
+            ).Include(
+                t => t.Event
+            ).FirstOrDefaultAsync(t => t.Id == id);
 
-            if (entity == null)
+            if (entity == null || entity.Id == 0)
                 throw new KeyNotFoundException($"TaskItem with id {id} not found");
 
             return entity;
@@ -46,7 +54,7 @@ namespace EventPlanner.Repository
         {
             var result = _context.TaskItems.Update(entity);
             await _context.SaveChangesAsync();
-            return result.Entity;
+            return await GetByIdAsync(entity.Id);
         }
     }
 }

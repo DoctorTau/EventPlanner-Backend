@@ -38,6 +38,19 @@ namespace EventPlanner.Repository
             return user;
         }
 
+        public async Task<User> GetUserWithDetailsAsync(int userId)
+        {
+            var user = await _dbContext.Users
+                .Include(u => u.Participations)
+                .Include(u => u.AssignedTasks)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                throw new KeyNotFoundException($"User with id {userId} not found");
+
+            return user;
+        }
+
         public async Task<User> CreateAsync(User user)
         {
             var result = await _dbContext.Users.AddAsync(user);
