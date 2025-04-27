@@ -16,13 +16,15 @@ namespace EventPlanner.Controllers.Controllers
     {
         private readonly IEventService _eventService;
         private readonly IUserService _userService;
+        private readonly IChatService _chatService;
         private readonly ITelegramUserAccessor _telegramUserAccessor;
 
-        public EventController(IEventService eventService, ITelegramUserAccessor telegramUserAccessor, IUserService userService)
+        public EventController(IEventService eventService, ITelegramUserAccessor telegramUserAccessor, IUserService userService, IChatService chatService)
         {
             _eventService = eventService;
             _telegramUserAccessor = telegramUserAccessor;
             _userService = userService;
+            _chatService = chatService;
         }
 
         [HttpPost("create")]
@@ -243,6 +245,38 @@ namespace EventPlanner.Controllers.Controllers
                 var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
                 var @event = await _eventService.ModifyPlanAsync(eventId, user.Id, planUpdateDto.original_plan, planUpdateDto.user_comment);
                 return Ok(@event.GeneratedPlans.Last().PlanText);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("{eventId}/SendMessage")]
+        [Authorize(AuthenticationSchemes = TgMiniAppAuthConstants.AuthenticationScheme)]
+        public async Task<IActionResult> SendMessageAsync(int eventId)
+        {
+            try
+            {
+                var user = await _userService.GetUserByTelegramIdAsync(_telegramUserAccessor.User.Id);
+
+                var @event = await _eventService.GetEventWithParticipantsAsync(eventId);
+                if (user == null || @event == null)
+                    return NotFound("Event not found");
+
+                if (@event.Participants.All(p => p.UserId != user.Id))
+                    return BadRequest("User is not a participant of this event");
+
+                await _chatService.SendSummaryMessageAsync(eventId);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception e)
             {

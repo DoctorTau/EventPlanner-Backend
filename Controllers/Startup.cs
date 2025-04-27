@@ -77,6 +77,7 @@ public class Startup
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IPlanGenerator, PlanGenerator>();
         services.AddScoped<ITaskService, TaskService>();
+        services.AddScoped<IChatService, ChatService>();
         services.AddHttpClient();
     }
 
