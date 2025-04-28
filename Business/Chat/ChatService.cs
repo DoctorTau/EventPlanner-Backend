@@ -27,6 +27,12 @@ namespace EventPlanner.Business
                               throw new ArgumentNullException("ChatService:Url is not configured");
         }
 
+        public async Task CreatePollAsync(BotPollCreateDto pollCreateDto)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{_chatServiceUrl}/create-poll", pollCreateDto);
+            response.EnsureSuccessStatusCode();
+        }
+
         public async Task SendSummaryMessageAsync(int eventId)
         {
             try

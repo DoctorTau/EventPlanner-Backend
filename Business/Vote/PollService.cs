@@ -16,7 +16,7 @@ namespace EventPlanner.Business
         private readonly IUserRepository _userRepository;
         private readonly IUserAvailabilityRepository _userAvailabilityRepository;
         private readonly IParticipantRepository _participantRepository;
-        private readonly string _voteCreationUrl;
+        private readonly IChatService _chatService;
 
         public PollService(
             IVoteRepository voteRepository,
@@ -25,17 +25,16 @@ namespace EventPlanner.Business
             IUserRepository userRepository,
             IUserAvailabilityRepository userAvailabilityRepository,
             IConfiguration configuration,
-            IParticipantRepository participantRepository)
+            IParticipantRepository participantRepository,
+            IChatService chatService)
         {
             _voteRepository = voteRepository;
             _pollRepository = votingRepository;
             _eventRepository = eventRepository;
             _userRepository = userRepository;
             _userAvailabilityRepository = userAvailabilityRepository;
-            _voteCreationUrl = configuration["TelegramBotUrl"] ?? throw new ArgumentNullException("VoteCreationUrl configuration is missing");
             _participantRepository = participantRepository;
-
-            _voteCreationUrl += "/start-vote";
+            _chatService = chatService;
         }
 
         public async Task<Poll> CreatePollAsync(PollCreateDto pollCreateDto)
@@ -135,16 +134,14 @@ namespace EventPlanner.Business
             Event @event = await _eventRepository.GetByIdAsync(poll.EventId)
                          ?? throw new Exception($"Event with id {poll.EventId} not found");
 
-
-            BotPollCreateDto botPollCreateDto = new()
-            {
-                votingId = poll.Id,
-                options = poll.Options,
-                chatId = @event.TelegramChatId
-            };
             try
             {
-                await SendVoteCreationRequestAsync(botPollCreateDto);
+                await _chatService.CreatePollAsync(new BotPollCreateDto
+                {
+                    votingId = poll.Id,
+                    options = poll.Options,
+                    chatId = @event.TelegramChatId
+                });
             }
             catch (HttpRequestException)
             {
@@ -153,17 +150,6 @@ namespace EventPlanner.Business
 
             poll.Status = PollStatus.Open;
             await _pollRepository.UpdateAsync(poll);
-        }
-
-        private async Task SendVoteCreationRequestAsync(BotPollCreateDto botPollCreateDto)
-        {
-            using var httpClient = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Post, _voteCreationUrl);
-            var content = new StringContent(JsonSerializer.Serialize(botPollCreateDto), Encoding.UTF8, "application/json");
-            request.Content = content;
-            var response = await httpClient.SendAsync(request);
-            Console.WriteLine(content);
-            response.EnsureSuccessStatusCode();
         }
 
         public async Task<Vote> CreateVoteAsync(VoteCreateDto voteCreateDto)
@@ -320,10 +306,5 @@ namespace EventPlanner.Business
         }
     }
 
-    internal class BotPollCreateDto
-    {
-        public int votingId { get; set; }
-        public required List<string> options { get; set; }
-        public long chatId { get; set; }
-    }
+
 }
