@@ -83,7 +83,7 @@ namespace EventPlanner.Business
             {
                 User user = await _userRepository.GetByIdAsync(participant.UserId);
                 List<UserAvailability> userAvailability = await _userAvailabilityRepository.GetByUserIdAsync(user.Id);
-                usersAvailabilities.Add(user.Id, userAvailability);
+                usersAvailabilities.Add(user.Id, userAvailability.Where(ua => ua.AvailableDate >= DateTime.UtcNow).ToList());
             }
 
             int totalParticipants = usersAvailabilities.Count;

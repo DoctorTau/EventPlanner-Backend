@@ -20,10 +20,7 @@ namespace EventPlanner.Business
         {
             try
             {
-                Console.WriteLine($"Event to add plan: {eventToAddPlan}");
                 PlanCreateDto planCreateDto = new PlanCreateDto(eventToAddPlan, prompt);
-
-                Console.WriteLine($"PlanCreateDto: {planCreateDto}");
 
                 var response = await _httpClient.PostAsJsonAsync($"{_llmServiceUrl}/plan/generate-plan", planCreateDto);
                 if (response.StatusCode != System.Net.HttpStatusCode.OK)
@@ -31,7 +28,11 @@ namespace EventPlanner.Business
                     Console.WriteLine($"Error: {response.StatusCode}");
                     throw new Exception($"Error from LLM service: {response.ReasonPhrase}");
                 }
-                return await response.Content.ReadAsStringAsync();
+                // Read as json and get "plan_text" field
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var planText = responseContent.Split('"')[3];
+                Console.WriteLine($"Generated plan text: {planText}");
+                return planText;
             }
             catch (HttpRequestException ex)
             {

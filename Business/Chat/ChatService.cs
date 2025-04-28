@@ -29,7 +29,7 @@ namespace EventPlanner.Business
 
         public async Task CreatePollAsync(BotPollCreateDto pollCreateDto)
         {
-            var response = await _httpClient.PostAsJsonAsync($"{_chatServiceUrl}/create-poll", pollCreateDto);
+            var response = await _httpClient.PostAsJsonAsync($"{_chatServiceUrl}/start-vote", pollCreateDto);
             response.EnsureSuccessStatusCode();
         }
 
