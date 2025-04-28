@@ -24,7 +24,6 @@ namespace EventPlanner.Business
             IEventsRepository eventRepository,
             IUserRepository userRepository,
             IUserAvailabilityRepository userAvailabilityRepository,
-            IConfiguration configuration,
             IParticipantRepository participantRepository,
             IChatService chatService)
         {
