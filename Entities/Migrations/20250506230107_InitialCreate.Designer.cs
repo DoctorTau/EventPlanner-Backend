@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Entities.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250317015922_ChangeFieldsNames")]
-    partial class ChangeFieldsNames
+    [Migration("20250506230107_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,16 +47,19 @@ namespace Entities.Migrations
                     b.Property<DateTime?>("EventDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("EventType")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Location")
                         .HasColumnType("text");
 
-                    b.Property<int?>("PlaceVotingId")
+                    b.Property<int?>("LocationPollId")
                         .HasColumnType("integer");
 
                     b.Property<long>("TelegramChatId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("TimeVotingId")
+                    b.Property<int?>("TimePollId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
@@ -68,10 +71,10 @@ namespace Entities.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.HasIndex("PlaceVotingId")
+                    b.HasIndex("LocationPollId")
                         .IsUnique();
 
-                    b.HasIndex("TimeVotingId")
+                    b.HasIndex("TimePollId")
                         .IsUnique();
 
                     b.ToTable("Events");
@@ -182,7 +185,7 @@ namespace Entities.Migrations
                         .IsRequired()
                         .HasColumnType("text[]");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -299,9 +302,6 @@ namespace Entities.Migrations
                     b.Property<int>("PollId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
@@ -332,21 +332,21 @@ namespace Entities.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EventPlanner.Entities.Models.Poll", "PlaceVoting")
+                    b.HasOne("EventPlanner.Entities.Models.Poll", "LocationPoll")
                         .WithOne()
-                        .HasForeignKey("EventPlanner.Entities.Models.Event", "PlaceVotingId")
+                        .HasForeignKey("EventPlanner.Entities.Models.Event", "LocationPollId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("EventPlanner.Entities.Models.Poll", "TimeVoting")
+                    b.HasOne("EventPlanner.Entities.Models.Poll", "TimePoll")
                         .WithOne()
-                        .HasForeignKey("EventPlanner.Entities.Models.Event", "TimeVotingId")
+                        .HasForeignKey("EventPlanner.Entities.Models.Event", "TimePollId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Creator");
 
-                    b.Navigation("PlaceVoting");
+                    b.Navigation("LocationPoll");
 
-                    b.Navigation("TimeVoting");
+                    b.Navigation("TimePoll");
                 });
 
             modelBuilder.Entity("EventPlanner.Entities.Models.EventDocument", b =>

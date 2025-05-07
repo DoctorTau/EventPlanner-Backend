@@ -53,9 +53,6 @@ namespace Entities.Migrations
                     b.Property<int?>("LocationPollId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PlacePollId")
-                        .HasColumnType("integer");
-
                     b.Property<long>("TelegramChatId")
                         .HasColumnType("bigint");
 

@@ -94,6 +94,12 @@ namespace EventPlanner.Data
             modelBuilder.Entity<UserAvailability>()
                 .HasKey(ua => new { ua.UserId, ua.AvailableDate });
 
+            modelBuilder.Entity<Poll>()
+                .HasOne(p => p.Event)
+                .WithMany()
+                .HasForeignKey(p => p.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.TimePoll)
                 .WithOne()
