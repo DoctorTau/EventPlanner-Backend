@@ -197,6 +197,10 @@ namespace EventPlanner.Controllers.Controllers
         {
             try
             {
+                if (!TokenValidator.CheckToken(Request.Headers))
+                {
+                    return Unauthorized("Invalid bot token");
+                }
                 var @event = await _eventService.GetEventByTelegramChatIdAsync(eventTgId);
                 var user = await _userService.GetUserByTelegramIdAsync(userTgId);
                 await _eventService.AddParticipantAsync(@event.Id, user.Id);

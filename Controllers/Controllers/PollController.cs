@@ -124,6 +124,11 @@ namespace EventPlanner.Controllers
         {
             try
             {
+                if (!TokenValidator.CheckToken(Request.Headers))
+                {
+                    return Unauthorized("Invalid bot token");
+                }
+
                 var vote = await _pollService.CreateVoteAsync(voteCreateDto);
                 return Ok(vote);
             }
